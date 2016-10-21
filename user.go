@@ -1,6 +1,6 @@
 package main
 
-import "code.google.com/p/go.crypto/bcrypt"
+import "golang.org/x/crypto/bcrypt"
 
 type User struct {
 	ID             string
@@ -10,9 +10,9 @@ type User struct {
 }
 
 const (
-	passwordLength = 8
 	hashCost       = 10
-	userIDLength
+	passwordLength = 6
+	userIDLength   = 16
 )
 
 func NewUser(username, email, password string) (User, error) {
@@ -44,7 +44,7 @@ func NewUser(username, email, password string) (User, error) {
 		return user, errUsernameExists
 	}
 
-	existingUser, err := globalUserStore.FindByEmail(email)
+	existingUser, err = globalUserStore.FindByEmail(email)
 	if err != nil {
 		return user, err
 	}
@@ -52,9 +52,8 @@ func NewUser(username, email, password string) (User, error) {
 		return user, errEmailExists
 	}
 
-	hashedPassword, err = bcrypt.GenerateFromPassword([]byte(password), hashCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), hashCost)
 	user.HashedPassword = string(hashedPassword)
 	user.ID = GenerateID("usr", userIDLength)
-
 	return user, err
 }

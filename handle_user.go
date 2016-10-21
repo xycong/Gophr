@@ -19,18 +19,21 @@ func HandleUserCreate(w http.ResponseWriter, r *http.Request, _ httprouter.Param
 
 	if err != nil {
 		if IsValidationError(err) {
-			RenderTemplate(w,r,"users/new", map[string] interface{} {
+			RenderTemplate(w, r, "users/new", map[string]interface{}{
 				"Error": err.Error(),
-				"User": user,
+				"User":  user,
 			})
 			return
 		}
 		panic(err)
+		return
 	}
 
-	err = globalUserStore.Save(user) 
+	err = globalUserStore.Save(user)
 	if err != nil {
 		panic(err)
+		return
 	}
-	http.Redirect(w,r,"/?flash=User+created", http.StatusFound)
+
+	http.Redirect(w, r, "/?flash=User+created", http.StatusFound)
 }
